@@ -1,0 +1,48 @@
+# Dataset
+data/
+train_dataset/
+test_dataset/
+
+# Model weights
+*.pt
+*.pth
+*.ckpt
+*.h5
+*.onnx
+
+# Outputs
+outputs/
+predictions.json
+*.csv
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Virtual environments
+venv/
+env/
+.venv/
+
+# IDEs
+.vscode/
+.idea/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Temporary files
+temp/
+tmp/
+
+# Kaggle / Colab
+kaggle.json
