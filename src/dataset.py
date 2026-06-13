@@ -17,7 +17,8 @@ class GCPDataset(Dataset):
     def __init__(
         self,
         json_path,
-        image_root
+        image_root,
+        indices=None
     ):
 
         self.image_root = Path(image_root)
@@ -26,15 +27,24 @@ class GCPDataset(Dataset):
             labels = json.load(f)
 
         self.samples = []
+        all_samples = []
 
         for path, info in labels.items():
 
             if "verified_shape" not in info:
                 continue
 
-            self.samples.append(
+            all_samples.append(
                 (path, info)
             )
+        
+        if indices is None:
+            self.samples = all_samples
+        else:
+            self.samples = [
+                all_samples[i]
+                for i in indices
+            ]
 
     def __len__(self):
         return len(self.samples)
