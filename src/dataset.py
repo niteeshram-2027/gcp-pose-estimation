@@ -47,15 +47,14 @@ class GCPDataset(Dataset):
             self.image_root / path
         )
 
-        image = cv2.imread(
-            str(img_path)
-        )
+        image = cv2.imread(str(img_path))
 
         image = cv2.cvtColor(
             image,
             cv2.COLOR_BGR2RGB
         )
 
+        # ORIGINAL dimensions
         h, w = image.shape[:2]
 
         x = info["mark"]["x"]
@@ -63,6 +62,12 @@ class GCPDataset(Dataset):
 
         x_norm = x / w
         y_norm = y / h
+
+        # ONLY AFTER normalization
+        image = cv2.resize(
+            image,
+            (1024,1024)
+        )
 
         shape = self.SHAPE_MAP[
             info["verified_shape"]
