@@ -20,8 +20,8 @@ from model import GCPModel
 JSON_PATH = "/content/drive/MyDrive/skylark_gcp/gcp_marks.json"
 IMAGE_ROOT = "/content/drive/MyDrive/skylark_gcp/train_dataset"
 
-BATCH_SIZE = 4
-EPOCHS = 1
+BATCH_SIZE = 8
+EPOCHS = 30
 LR = 1e-4
 
 
