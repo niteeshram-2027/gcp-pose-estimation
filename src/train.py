@@ -1,20 +1,23 @@
 import torch
 import torch.nn as nn
 
+from tqdm import tqdm
+
 from torch.utils.data import DataLoader
 from sklearn.model_selection import train_test_split
+from sklearn.utils.class_weight import compute_class_weight
 
-from dataset import GCPDataset
+from dataset import (
+    GCPDataset,
+    train_transform,
+    val_transform
+)
+
 from model import GCPModel
 
-print("Dataset loaded")
 
-print("Train Dataset:", len(train_dataset))
-print("Val Dataset:", len(val_dataset))
-
-print("Creating dataloaders")
-JSON_PATH = "../gcp_marks.json"
-IMAGE_ROOT = "../data/train_dataset"
+JSON_PATH = "/content/drive/MyDrive/skylark_gcp/gcp_marks.json"
+IMAGE_ROOT = "/content/drive/MyDrive/skylark_gcp/train_dataset"
 
 BATCH_SIZE = 4
 EPOCHS = 1
@@ -22,8 +25,7 @@ LR = 1e-4
 
 
 device = torch.device(
-    "cuda"
-    if torch.cuda.is_available()
+    "cuda" if torch.cuda.is_available()
     else "cpu"
 )
 
@@ -35,9 +37,7 @@ full_dataset = GCPDataset(
     IMAGE_ROOT
 )
 
-indices = list(
-    range(len(full_dataset))
-)
+indices = list(range(len(full_dataset)))
 
 train_idx, val_idx = train_test_split(
     indices,
@@ -48,35 +48,63 @@ train_idx, val_idx = train_test_split(
 train_dataset = GCPDataset(
     JSON_PATH,
     IMAGE_ROOT,
-    train_idx
+    train_idx,
+    train_transform
 )
 
 val_dataset = GCPDataset(
     JSON_PATH,
     IMAGE_ROOT,
-    val_idx
+    val_idx,
+    val_transform
 )
 
 train_loader = DataLoader(
     train_dataset,
     batch_size=BATCH_SIZE,
-    shuffle=True
+    shuffle=True,
+    num_workers=2
 )
 
 val_loader = DataLoader(
     val_dataset,
-    batch_size=BATCH_SIZE
+    batch_size=BATCH_SIZE,
+    num_workers=2
 )
-
-print("Dataloaders created")
 
 model = GCPModel().to(device)
 
 
+shape_map = {
+    "Cross": 0,
+    "Square": 1,
+    "L-Shape": 2
+}
+
+labels = [
+    shape_map[
+        sample[1]["verified_shape"]
+    ]
+    for sample in full_dataset.samples
+]
+
+weights = compute_class_weight(
+    class_weight="balanced",
+    classes=[0,1,2],
+    y=labels
+)
+
+weights = torch.tensor(
+    weights,
+    dtype=torch.float32
+).to(device)
+
+
 coord_loss_fn = nn.SmoothL1Loss()
 
-shape_loss_fn = nn.CrossEntropyLoss()
-
+shape_loss_fn = nn.CrossEntropyLoss(
+    weight=weights
+)
 
 optimizer = torch.optim.AdamW(
     model.parameters(),
@@ -92,7 +120,9 @@ for epoch in range(EPOCHS):
 
     train_loss = 0
 
-    for images, coords, shapes in train_loader:
+    loop = tqdm(train_loader)
+
+    for images, coords, shapes in loop:
 
         images = images.to(device)
 
@@ -126,6 +156,14 @@ for epoch in range(EPOCHS):
         optimizer.step()
 
         train_loss += loss.item()
+
+        loop.set_description(
+            f"Epoch {epoch+1}"
+        )
+
+        loop.set_postfix(
+            loss=loss.item()
+        )
 
     train_loss /= len(train_loader)
 
@@ -171,9 +209,9 @@ for epoch in range(EPOCHS):
     val_loss /= len(val_loader)
 
     print(
-        f"Epoch {epoch+1} | "
-        f"Train {train_loss:.4f} | "
-        f"Val {val_loss:.4f}"
+        f"Epoch {epoch+1}/{EPOCHS} | "
+        f"Train={train_loss:.4f} | "
+        f"Val={val_loss:.4f}"
     )
 
     if val_loss < best_val_loss:
@@ -182,7 +220,7 @@ for epoch in range(EPOCHS):
 
         torch.save(
             model.state_dict(),
-            "../outputs/best_model.pth"
+            "best_model.pth"
         )
 
         print("Saved Best Model")
