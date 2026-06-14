@@ -1,10 +1,19 @@
 import json
 import cv2
 import torch
+import albumentations as A
 
 from pathlib import Path
 from torch.utils.data import Dataset
 
+train_transform = A.Compose([
+    A.HorizontalFlip(p=0.5),
+    A.VerticalFlip(p=0.5),
+    A.RandomRotate90(p=0.5),
+    A.RandomBrightnessContrast(p=0.3)
+])
+
+val_transform = A.Compose([])
 
 class GCPDataset(Dataset):
 
@@ -18,10 +27,12 @@ class GCPDataset(Dataset):
         self,
         json_path,
         image_root,
-        indices=None
+        indices=None,
+        transform=None
     ):
 
         self.image_root = Path(image_root)
+        self.transform = transform
 
         with open(json_path) as f:
             labels = json.load(f)
@@ -77,7 +88,12 @@ class GCPDataset(Dataset):
             image,
             (IMG_SIZE, IMG_SIZE)
         )
-
+        
+        if self.transform:
+            image = self.transform(
+                image=image
+            )["image"]
+            
         shape = self.SHAPE_MAP[
             info["verified_shape"]
         ]
