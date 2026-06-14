@@ -225,6 +225,6 @@ This approach provided a good balance between localization accuracy, training ef
 
 ## Author
 
-Niteesh Ram
-Computer Vision Engineering Assignment Submission
-Skylark Drones
+- Niteesh Ram
+- Computer Vision Engineering Assignment Submission
+- Skylark Drones
