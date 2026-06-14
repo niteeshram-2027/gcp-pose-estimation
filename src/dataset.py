@@ -64,7 +64,6 @@ class GCPDataset(Dataset):
             cv2.COLOR_BGR2RGB
         )
 
-        # ORIGINAL dimensions
         h, w = image.shape[:2]
 
         x = info["mark"]["x"]
@@ -73,10 +72,10 @@ class GCPDataset(Dataset):
         x_norm = x / w
         y_norm = y / h
 
-        # ONLY AFTER normalization
+        IMG_SIZE = 768
         image = cv2.resize(
             image,
-            (512,512)
+            (IMG_SIZE, IMG_SIZE)
         )
 
         shape = self.SHAPE_MAP[
