@@ -4,7 +4,6 @@ train_dataset/
 test_dataset/
 
 gcp_marks.json
-predictions.json
 best_model.pth
 
 # Model weights
