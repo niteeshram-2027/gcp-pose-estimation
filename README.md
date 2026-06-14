@@ -222,6 +222,34 @@ This approach provided a good balance between localization accuracy, training ef
 - The provided annotations are assumed to be correct unless obvious inconsistencies are observed.
 
 ---
+## Model Weights
+
+The trained model checkpoint can be downloaded from:
+
+Google Drive:
+https://drive.google.com/file/d/1gjDP2-RfBxQZEw0zASU33b96F5sNoklS/view?usp=sharing
+
+File:
+best_model.pth
+
+After downloading, place the file in the project root directory.
+
+Example structure:
+
+```text
+gcp-pose-estimation/
+├── best_model.pth
+├── src/
+├── notebooks/
+├── README.md
+└── requirements.txt
+```
+
+The inference script automatically loads this checkpoint:
+
+```bash
+python src/inference.py
+```
 
 ## Author
 
