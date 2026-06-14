@@ -15,7 +15,6 @@ best_model.pth
 
 # Outputs
 outputs/
-predictions.json
 *.csv
 
 # Jupyter
