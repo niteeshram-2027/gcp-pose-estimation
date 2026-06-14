@@ -1,5 +1,6 @@
 import torch
 import torch.nn as nn
+import numpy as np
 
 from tqdm import tqdm
 
@@ -90,8 +91,8 @@ labels = [
 
 weights = compute_class_weight(
     class_weight="balanced",
-    classes=[0,1,2],
-    y=labels
+    classes=np.array([0,1,2]),
+    y=np.array(labels)
 )
 
 weights = torch.tensor(
