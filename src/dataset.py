@@ -76,7 +76,7 @@ class GCPDataset(Dataset):
         # ONLY AFTER normalization
         image = cv2.resize(
             image,
-            (1024,1024)
+            (512,512)
         )
 
         shape = self.SHAPE_MAP[
